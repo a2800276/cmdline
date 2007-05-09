@@ -27,7 +27,7 @@ You can install the +cmdline+ package by executing:
 	gem install cmdline -r
 
 alternatively, you can download +.tar.gz+ or +.zip+ archives from 
-Rubyforge[http://rubyforge.org/frs/?group_id=] and install using the
+Rubyforge[http://rubyforge.org/frs/?group_id=3612] and install using the
 +setup.rb+ script.
 
 == Types of Arguments
