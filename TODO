@@ -1,0 +1,23 @@
+There's so much left to do that I don't even know where to start. These are
+just notes.
+
+* Rakefile task for submitting to rubyforge. 
+  xforge vs. rubyforge (...)
+* Dealing with Version Control, automating tagging etc. in Rakefile
+
+* source code commenting
+* command line arguments
+* dealing with c extensions
+
+* unit testing (runit rcov)
+* template for project structure.
+
+* dealing with `data` files (e.g. ZIP code data)
+* dealing with non ruby bits (sql, c)
+
+* i18n figure out how to link between documentation files without silly
+* link notation
+* Release checklist (rubyforge stuff, packaging, updated documentation,
+  announcements: mailing lists/RAA/other listings) 
+ 
+

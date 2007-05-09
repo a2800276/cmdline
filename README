@@ -1,0 +1,242 @@
+
+= cmdline -- Yet Another Command Line Tool 
+
++cmdline+ is a small library to facilitate handling of command line
+arguments. +cmdline+ automatically checks that all required arguments
+and flags are set, performs validity checks on the arguments
+and automatically generates a usage message from the command line
+specification. Arguments are available via named accessors.
+
+	cmdline=CommandLine.new [
+		["-f", "-flag", :starts_with_a_digit, "value", true, nil, "must start with a number", /^\d.*/]
+	]
+	cmdline.parse ARGV
+	puts cmdline.starts_with_a_digit
+
+In the example above, +cmdline+ ensure the +ARGV+ array contains a -f
+(or -flag) flag which must have an argument that starts with a digit. If
+an approriate argument is found, it will be accessible via the
+automaticaly created +starts_with_a_digit+ accessor. If not, a usage
+message will be generate, printed and the application will exit.
+
+
+== Installing
+
+You can install the +cmdline+ package by executing:
+
+	gem install cmdline -r
+
+alternatively, you can download +.tar.gz+ or +.zip+ archives from 
+Rubyforge[http://rubyforge.org/frs/?group_id=] and install using the
++setup.rb+ script.
+
+== Types of Arguments
+
+* long and short flags : 
+	script.rb -s -long_flag
+* flags taking arguments: 
+	script.rb -o outfilename
+* subcommands (a la +gem+ or +svn+):
+	script.rb generate -h
+if you want to use subcommands, they have to appear as the very first
+argument, i.e. this is not possible
+	script.rb -v subcommand -h # NOT POSSIBLE
+* plain arguments:
+	script.rb -v file_name
+
+
+
+== Usage
+
+You'll need to require +cmdline+ like this:
+
+	require 'cmdline'
+
+(if you installed the package using gems, you'll either need to use:
+
+	require_gem 'cmdline'
+
+or start ruby with the -rubygems command line flag.)
+
+In order to use +cmdline+, you'll need to provide an array containing
+a definition for each argument and pass the +ARGV+ to the method
++parse+. (Actually, you can pass in any array, or none, in which case,
+ARGV will be used by default) An example (from examples/exmaple.rb):
+
+	require 'cmdline'	
+	cmdline=CommandLine.new [
+		["-m", "-message", :message, "message", true, nil, "message for 'usage'"]
+	]
+	cmdline.parse ARGV
+	puts cmdline.message
+
+Running the script yields:
+
+	$ruby example.rb
+	usage: example.rb options
+	  -m/-message <message>* message for 'usage'
+	  -h/--help              print this message
+	* required flags
+
+	missing mandatory flag -m 
+
+The definition for the --help flag was added by default. Running the
+script with the required argument yields:
+
+	$ruby example.rb -message 'This is the message to print.'
+	This is the message to print.
+
+=== Flag Definition
+
+Each argument that is should be accepted is defined using an array. In the
+above example, a single argument is defined:
+
+	["-m", "-message", :message, "message", true, nil, "message for 'usage'"]
+
+The meaning of the fields in the definition array (at least for flags)
+are as follows:
+
+1. the 'short' flag name
+2. the long flag name
+3. the name of the accessor through which the flag value will be available 
+4. this value defines whether the flag takes arguments (i.e. script.rb -o outfile). Value should be +false+ if the flag takes no argument (i.e.  script.rb -verbose) or a string which is used in the generated +usage+ message.
+5. whether this is a required argument
+6. default value in case the flag is not set on the command line
+7. a detailed message for the generated usage string
+8. an optional eighth argument that may be either a +proc+ or a regular expression to check the the validity of the passed argument or and Array containing all allowed arguments. 
+
+
+=== Subcommand Definition
+
+Subcommands are defined in a simliar manner. An example of how one would parse
++gem+ subcommands (from examples/subcommand_example.rb):
+
+	doc= <<END_DOC
+	    build            Build a gem from a gemspec
+	    cert             Adjust RubyGems certificate settings
+	    check            Check installed gems
+	    cleanup          Clean up old versions of installed gems in the local
+			     repository
+	    contents         Display the contents of the installed gems
+	    ...
+	END_DOC
+
+	command_arr=["build", "cert", "check", "cleanup", "contents"] # ...
+	cmdline=CommandLine.new [
+		[:command, nil, :command, "command", false, "build", doc, command_arr]
+	]
+
+	puts cmdline.command
+
+In this example, the subcommand isn't  required, so we'll use the
+automatically generated -h flag to display the usage message:
+
+	$ruby subcommand_example.rb -h
+	usage: subcommand_example.rb [command] [options]
+	    build            Build a gem from a gemspec
+	    cert             Adjust RubyGems certificate settings
+	    check            Check installed gems
+	    cleanup          Clean up old versions of installed gems in the local
+			     repository
+	    contents         Display the contents of the installed gems
+	    ...
+	  -h/--help print this message
+
+
+=== Final Arguments
+
+In order to access, verify and add usage information for plain
+arguments after flags (e.g. copy.rb -name tim -v file1 file2 file3) you
+can add a final definition (from examples/plain_args_example.rb):
+
+	args_doc = "files to process"		
+	file_readable=lambda{|f| File.readable? f}
+	cmdline=CommandLine.new [
+		[:args, nil, :args, "args", false, nil, args_doc, file_readable]
+	]
+	cmdline.parse ARGV
+	puts cmdline.args
+
+In the example above the file arguments are required. So running the
+example without args yields:
+
+	$ruby plain_args_example.rb
+	usage: plain_args_example.rb [options] args
+	  -h/--help print this message
+
+	args: files to process
+
+	missing mandatory args
+
+Finally, a proc is passed to check that any filename arguments refer to
+readable files.
+
+=== Putting it all together
+
+(from examples/long_example.rb):
+
+	commands_check= ["add", "blame", "cat", "checkout"]
+	file_readable=lambda{|f| File.readable? f}
+	cmdline=CommandLine.new [
+		[:command, nil, :command, "command", false, "add", commands_doc, commands_check],
+		["-o", nil, :outfile, "file", false, STDOUT, "filename to write output to, default STDOUT"],
+		["-i", "--infile", :infile, "file",  false, STDIN, "filename to read from, default STDIN", file_readable],
+		["-v", "--verbose", :verbose, false,  false, nil, "verbose"],
+		["-n", "--numeric", :number, "num",  true, nil, "numeric value", /^\d+$/],
+		[:args, nil, :args, "args", false, nil, args_doc, file_readable]
+	]
+	
+
+This definition requires:
+
+* an optional subcommand which defaults to "add"
+* an optional -o flag which defaults to STDOUT
+* an optional -i/--infile flag which checks that filename args refer to readable files	
+* an optional -v flag that doesn't take an argument
+* a mandatory -n/--numeric flag which checks the argument is numeric
+* optional args, which, if passed must be names of readable files
+
+The generated usage message will look like this:
+
+	$ruby long_example.rb 
+	usage: long_example.rb [command] options [args]
+
+	Available commands:
+	  add
+	  blame
+	  cat
+	  checkout
+
+	  -o <file>           filename to write output to, default STDOUT
+	  -i/--infile <file>  filename to read from, default STDIN
+	  -v/--verbose        verbose
+	  -n/--numeric <num>* numeric value
+	  -h/--help           print this message
+	* required flags
+
+	args: files to process
+
+	missing mandatory flag -n
+
+
+== Contact
+
+In case you discover bugs, offer suggestions for improvements or would
+like to help out with the project, you can contact me via email
+(tim@kuriositaet.de).	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=
