@@ -9,7 +9,7 @@ require "rubygems"
 
 SHORTNAME	='cmdline'	# this should be the rubyforge project name
 DESC		='Yet Another Command Line Tool'
-PKG_VERSION 	='0.0.0'
+PKG_VERSION 	='0.0.1'
 LONG_DESC	= <<END_DESC
 	Library used to handle command line arguments.	
 END_DESC
@@ -42,7 +42,7 @@ Rake::RDocTask.new do |rd|
 	
 	# The following line specifies all the files to extract
 	# documenation from.
-	rd.rdoc_files.include(	"README", "AUTHORS", "LICENSE", "TODO",
+	rd.rdoc_files.include(	"README", "AUTHORS", "LICENSE", 
 				"CHANGELOG", "bin/**/*", "lib/**/*.rb", 
 				"examples/**/*rb","test/**/*.rb", "doc/*.rdoc")
 	# This one specifies the output directory ...
@@ -106,7 +106,6 @@ task :upload_pages => ["rdoc"] do
   if RubyForgeProject then
     path = "/var/www/gforge-projects/#{RubyForgeProject}"
     sh "scp -r doc/html/* #{RUBYFORGE_USER}@rubyforge.org:#{path}"
-    sh "scp doc/images/*.png #{RUBYFORGE_USER}@rubyforge.org:#{path}/images"
   end
 end
 
