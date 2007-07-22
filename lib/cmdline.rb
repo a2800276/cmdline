@@ -220,9 +220,9 @@ class CommandLine
 				usage "illegal value: #{val} for: #{definition[FLAG_1]}"
 			end
 		elsif check.kind_of? Proc
-			usage "illegal value: #{val} for: #{definition[FLAG1]}" unless definition[CHECK].call val
+			usage "illegal value: #{val} for: #{definition[FLAG_1]}" unless definition[CHECK].call val
 		elsif check.kind_of? Array
-			usage "illegal value: #{val} for: #{definition[FLAG1]}" unless definition[CHECK].include? val
+			usage "illegal value: #{val} for: #{definition[FLAG_1]}" unless definition[CHECK].include? val
 		end
 
 		return true

@@ -1,3 +1,7 @@
+= Version 0.0.2
+=== Sun Jul 22 20:58:10 CEST 2007
+minor bugfix handling procs
+
 = Version 0.0.1
 changed to Version 0.0.1 because gems doesn't handle
 Version 0.0.0 nicely ...
