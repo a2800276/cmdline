@@ -22,15 +22,21 @@ class CommandLine
 
 
 	# definition
-	# [ :command, nil, <accessor>, <display name>, <required?>, <default>, <doc>, <check allowed commands> ]
-	# 	command is a subcommand, cf. `svn help`, 
-	# [ <flag1>, <flag2/nil>, <accessor>, <display name>, <required?>, <default>, <doc>, <check: optional> ]
+  #
+	#   [ :command, nil, <accessor>, <display name>, <required?>, <default>, <doc>, <check allowed commands> ]
+	# 
+  # command is a subcommand, cf. `svn help`, 
+	# 
+  #   [ <flag1>, <flag2/nil>, <accessor>, <display name>, <required?>, <default>, <doc>, <check: optional> ]
 	#
 	# commandline taking arguments, e.g. `mv src target` are specified like this:
-	# [ :args, nil, <accessor>, <display name>, <required>, <default>, <doc>, <check: optional> ]
-	# the entire rest of the commandline arg array after the first unrecognized options
+	# 
+  #   [ :args, nil, <accessor>, <display name>, <required>, <default>, <doc>, <check: optional> ]
+	# 
+  # the entire rest of the commandline arg array after the first unrecognized options
 	# will then be available under `cmdline.<accessor>` the check proc will either be able to check the entire
 	# array or, if that fails with an exception, will test each element individually.
+
 	def initialize definition
 		self.definition= definition
 		@output_io ||= STDERR
@@ -175,8 +181,8 @@ class CommandLine
 				end	
 			else	# are unknown flags ok? i.e. is there an :args definition.
 				if definition = @definition.retrieve_flag(:args)
-					check_args definition, args[i, args.length-1]
-					set definition[ACCESSOR], args[i, args.length-1]
+					check_args definition, args[i..(args.length-1)]
+					set definition[ACCESSOR], args[i..(args.length-1)]
 					break
 				end
 				usage "unknown flag: #{args[i]}"
@@ -187,7 +193,7 @@ class CommandLine
 		if definition = @definition.retrieve_flag(:args) # are :args required?
 			if definition[REQUIRED]
 				args = self.send definition[ACCESSOR]
-				usage "missing mandatory args" unless args && args.length>1
+				usage "missing mandatory args" unless args && args.length>0
 			end
 		end
 		

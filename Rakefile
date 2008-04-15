@@ -9,7 +9,7 @@ require "rubygems"
 
 SHORTNAME	='cmdline'	# this should be the rubyforge project name
 DESC		='Yet Another Command Line Tool'
-PKG_VERSION 	='0.0.1'
+PKG_VERSION 	='0.0.2'
 LONG_DESC	= <<END_DESC
 	Library used to handle command line arguments.	
 END_DESC
@@ -18,7 +18,7 @@ RUBYFORGE_USER	='a2800276'
 # Specifies the default task to execute. This is often the "test" task
 # and we'll change things around as soon as we have some tests.
 
-task  :default => [:rdoc]
+task  :default => [:test]
 
 # The directory to generate +rdoc+ in.
 RDOC_DIR="doc/html"

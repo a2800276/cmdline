@@ -1,3 +1,7 @@
+=== Tue Apr 15 20:22:15 CEST 2008
+bugfix single :arg, added test
+
+
 = Version 0.0.2
 === Sun Jul 22 20:58:10 CEST 2007
 minor bugfix handling procs
